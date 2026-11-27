@@ -23,10 +23,59 @@ etablissements={"Champ de blé":[[1],1,"b"],
                 "Stade":[[6],6,"p"],
                 "Chaine de television":[[6],7,"p"]
                 }
-
-
+#################################################################
+class Jeu:
     
+    def __init__(self, joueurs):
+        self._joueurs : list(Joueur) = joueurs
+        self._joueur_actuel : Joueur = self._joueurs[0]
+        self._reserve : Reserve = Reserve()
 
+
+    def tour(self):
+        if Gare in self._joueur_actuel._monuments:
+            Gare.effet(self._joueur_actuel)
+
+##############################################################
+class Joueur:
+    def __init__(self, nom, ordre):
+        self._nom : str = nom
+        self._ordre : int = ordre
+        self._etablissements : list(str) = ["champ_de_ble", "boulangerie"]
+        self._monuments : list(monument) = []
+        self._solde : int = 3
+        self._de1 : int = 0
+        self._de2 : int = 0
+
+    def lancer_de(self,combien = 0):
+        if combien == 0:
+            self._de1 = np.random.randint(1,7)
+            self._de2 = 0
+        elif combien == 1:
+            self._de1 = np.random.randint(1,7)
+            self._de2 = np.random.randint(1,7)
+
+    def recevoir_piece(self, montant):
+        self._solde += montant
+
+    def payer(self, montant):
+        if self._solde >= montant:
+            self._solde -= montant
+
+    def acheter_etabliseement(self, etabliseement):
+        if self._solde >= etabliseement._cout and self._reserve.est_disponible(etabliseement._nom):
+            self.payer(etabliseement._cout)
+            self._etablissements.append(etabliseement)
+
+    def acheter_monument(self, monument):
+        if self._solde >= monument._cout and monument not in self._monuments:
+            self.payer(monument._cout)
+            self._monuments.append(monument)
+        
+    def possede_monument(self, monument):
+        return monument in self._monuments
+
+######################################################
 class carte(ABC):
     def __init__(self,nom:str):
         self._nom=nom
@@ -35,6 +84,7 @@ class carte(ABC):
     def effet(self):
         pass
 
+#################################################
 class monument:
     def __init__(self,nom:str):
         super().__init__(nom)
@@ -54,9 +104,7 @@ class monument:
             if joueur._de1 == joueur._de2:
 
 
-        else:
-
-
+#####################################################################
 class etablissement:
     def __init__(self,nom:str):
         super().__init__(nom)
@@ -65,6 +113,7 @@ class etablissement:
         self._type = etablissements[self._nom][2]
 
 
+################################################
 class reserve:
     def __init__(self):
         self._etablissement_dispo={"Champ de blé":6,
